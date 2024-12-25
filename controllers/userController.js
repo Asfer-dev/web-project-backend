@@ -29,12 +29,15 @@ const registerUser = asyncHandler(async (req, res) => {
     name,
     email,
     password: hashedPassword,
-  }).lean();
+  });
 
   if (user) {
     res.status(201).json({
-      ...user,
-      token: generateToken(user._id),
+      _id: user._doc._id,
+      role: user._doc.role,
+      email: user._doc.email,
+      name: user._doc.name,
+      token: generateToken(user._doc._id),
     });
   } else {
     res.status(400);
@@ -48,11 +51,16 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email }).lean();
+  const user = await User.findOne({ email })
+    .select("name email role password")
+    .lean();
 
-  if (user && bcrypt.compare(password, user.password)) {
+  if (user && (await bcrypt.compare(password, user.password))) {
     res.json({
-      ...user,
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
       token: generateToken(user._id),
     });
   } else {
