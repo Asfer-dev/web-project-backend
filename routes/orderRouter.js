@@ -7,7 +7,7 @@ const {
 const { authenticate, adminOnly } = require("../middleware/authMiddleware");
 var router = express.Router();
 
-router.route("/").get(getOrders).post(authenticate, adminOnly, setOrder);
+router.route("/").get(getOrders).post(setOrder);
 
 router.route("/:id").put(authenticate, adminOnly, updateOrder);
 // .delete(authenticate, adminOnly, deleteOrder);

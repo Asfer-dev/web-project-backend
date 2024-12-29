@@ -11,7 +11,7 @@ const getOrders = asyncHandler(async (req, res) => {
 
 // @desc    Add an Order
 // @route   POST /api/orders
-// @access  Private
+// @access  Public
 const setOrder = asyncHandler(async (req, res) => {
   if (!req.body.line_items) {
     res.status(400);

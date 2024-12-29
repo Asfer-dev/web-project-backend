@@ -8,7 +8,11 @@ const {
   getProduct,
 } = require("../controllers/productController");
 const { authenticate, adminOnly } = require("../middleware/authMiddleware");
+const User = require("../models/userModel");
 var router = express.Router();
+const fs = require("fs");
+const path = require("path");
+const Product = require("../models/productModel");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -38,14 +42,49 @@ const upload = multer({
   },
 });
 
-function addUploadedImagesToImagesArray(req, res, next) {
+const deleteFile = (fileLocation) => {
+  const filePath = path.join(
+    __dirname.split("routes")[0],
+    "public",
+    fileLocation
+  );
+
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error(`Error deleting file: ${err}`);
+    } else {
+      console.log(`File ${fileLocation} deleted successfully`);
+    }
+  });
+};
+
+async function addUploadedImagesToImagesArray(req, res, next) {
   try {
+    // add the uploaded files' paths to images array
     if (req.body.images) req.body.images = JSON.parse(req.body.images);
     else req.body.images = [];
     const images = req.files.map((file) => file.path.split("public")[1]);
     req.body.images = [...req.body.images, ...images];
 
+    // parse properties in json format
     req.body.properties = JSON.parse(req.body.properties);
+    next();
+  } catch (error) {
+    res.status(500);
+    throw new Error(
+      error.message || "An error occurred while creating the product"
+    );
+  }
+}
+
+async function deleteRemovedImages(req, res, next) {
+  try {
+    // delete the removed image files if any
+    const product = await Product.findById(req.body.id);
+    const removedImages = product.images.filter(
+      (image) => !req.body.images.includes(image)
+    );
+    removedImages.forEach((imagePath) => deleteFile(imagePath));
     next();
   } catch (error) {
     res.status(500);
@@ -74,6 +113,7 @@ router
     adminOnly,
     upload.array("imageFiles"),
     addUploadedImagesToImagesArray,
+    deleteRemovedImages,
     updateProduct
   )
   .delete(authenticate, adminOnly, deleteProduct);

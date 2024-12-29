@@ -76,6 +76,15 @@ const getMe = asyncHandler(async (req, res) => {
   res.status(200).json(req.user);
 });
 
+// @desc    Get User cart
+// @route   GET /api/users/cart
+// @access  Private
+const getCart = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  res.json(user.cart);
+});
+
 // @desc    Update User cart
 // @route   POST /api/users/cart
 // @access  Private
@@ -92,10 +101,43 @@ const setCart = asyncHandler(async (req, res) => {
   res.json({ message: "cart updated" });
 });
 
+// @desc    Get User Wishlist
+// @route   GET /api/users/wishlist
+// @access  Private
+const getWishlist = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  res.json(user.wishlist);
+});
+
+// @desc    Update User Wishlist
+// @route   POST /api/users/wishlist
+// @access  Private
+const setWishlist = asyncHandler(async (req, res) => {
+  const { wishlist } = req.body;
+  if (!wishlist) {
+    res.status(400);
+    throw new Error("no wishlist provided");
+  }
+  const user = await User.findById(req.user._id);
+  user.wishlist = wishlist;
+  await user.save();
+
+  res.json({ message: "wishlist updated" });
+});
+
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "30d",
   });
 };
 
-module.exports = { registerUser, loginUser, getMe, setCart };
+module.exports = {
+  registerUser,
+  loginUser,
+  getMe,
+  setCart,
+  getCart,
+  getWishlist,
+  setWishlist,
+};

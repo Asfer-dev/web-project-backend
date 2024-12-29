@@ -18,7 +18,7 @@ const getProducts = asyncHandler(async (req, res) => {
         ...product,
         category: categories.find(
           (cat) => cat._id.toString() === product.category.toString()
-        ).name,
+        )?.name,
       };
     }
     return product;
