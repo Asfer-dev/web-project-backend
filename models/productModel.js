@@ -13,6 +13,10 @@ const productSchema = mongoose.Schema(
     category: {
       type: mongoose.Schema.Types.ObjectId,
     },
+    use_category_description: {
+      type: Boolean,
+      default: false,
+    },
     description: {
       type: String,
     },

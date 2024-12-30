@@ -9,6 +9,18 @@ const getOrders = asyncHandler(async (req, res) => {
   res.status(200).json(orders);
 });
 
+// @desc    Get a single Order
+// @route   GET /api/orders/:id
+// @access  Public
+const getOrder = asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id);
+  if (!order) {
+    res.status(400);
+    throw new Error("Order not found");
+  }
+  res.status(200).json(order);
+});
+
 // @desc    Add an Order
 // @route   POST /api/orders
 // @access  Public
@@ -106,4 +118,5 @@ module.exports = {
   getOrders,
   setOrder,
   updateOrder,
+  getOrder,
 };

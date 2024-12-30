@@ -35,6 +35,15 @@ const getProduct = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Product not found");
   }
+  if (product.category) {
+    const category = await Category.findById(product.category).select(
+      "name description"
+    );
+    // product.category = category;
+    const updatedProduct = { ...product._doc, category: category };
+    res.status(200).json(updatedProduct);
+    return;
+  }
   res.status(200).json(product);
 });
 
@@ -119,6 +128,8 @@ const updateProduct = asyncHandler(async (req, res) => {
   product.properties = req.body.properties;
   product.category = req.body.category;
   if (req.body.category === "") product.category = null;
+  product.use_category_description = req.body.use_category_description;
+  console.log(product.use_category_description);
   product.description = req.body.description;
   product.price = req.body.price;
   product.images = req.body.images;
