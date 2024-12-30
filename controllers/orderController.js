@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Order = require("../models/orderModel");
+const User = require("../models/userModel");
 
 // @desc    Get Orders
 // @route   GET /api/orders
@@ -51,6 +52,15 @@ const setOrder = asyncHandler(async (req, res) => {
   }
   try {
     const order = await Order.create(req.body);
+
+    // add order id to the user's placed_orders array
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    user.placed_orders.push(order._id);
+    await user.save();
+
     res.status(201).json(order);
   } catch (error) {
     res.status(500);
@@ -95,9 +105,16 @@ const updateOrder = asyncHandler(async (req, res) => {
     throw new Error("city field is required");
   }
 
-  const updatedOrder = await Order.findByIdAndUpdate(req.params.id, req.body);
+  order.name = req.body.name;
+  order.email = req.body.email;
+  order.address = req.body.address;
+  order.city = req.body.city;
+  order.country = req.body.country;
+  order.postal = req.body.postal;
+  order.completed = req.body.completed;
+  await order.save();
 
-  res.status(200).json(updatedOrder);
+  res.status(200).json("ok");
 });
 
 // // @desc    Delete a Category

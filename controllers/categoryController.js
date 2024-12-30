@@ -5,14 +5,8 @@ const Category = require("../models/categoryModel");
 // @route   GET /api/categories
 // @access  Public
 const getCategories = asyncHandler(async (req, res) => {
-  const categories = await Category.find();
-  const populatedCategories = await Promise.all(
-    categories.map(async (category) => {
-      const parent = await Category.findById(category.parent);
-      return { ...category._doc, parent: parent };
-    })
-  );
-  res.status(200).json(populatedCategories);
+  const categories = await Category.find().populate("parent");
+  res.status(200).json(categories);
 });
 
 // @desc    Get a single Category

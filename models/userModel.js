@@ -22,10 +22,17 @@ const userSchema = mongoose.Schema(
     },
     cart: {
       type: [mongoose.Schema.Types.ObjectId],
+      ref: "Product",
       default: [],
     },
     wishlist: {
       type: [mongoose.Schema.Types.ObjectId],
+      ref: "Product",
+      default: [],
+    },
+    placed_orders: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Order",
       default: [],
     },
   },

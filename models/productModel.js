@@ -12,6 +12,7 @@ const productSchema = mongoose.Schema(
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
     },
     use_category_description: {
       type: Boolean,

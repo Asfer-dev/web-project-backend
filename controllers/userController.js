@@ -76,6 +76,17 @@ const getMe = asyncHandler(async (req, res) => {
   res.status(200).json(req.user);
 });
 
+// @desc    Update User data
+// @route   PUT /api/users/me
+// @access  Private
+const updateMe = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  user.name = req.body.name;
+  user.email = req.body.email;
+  const updatedUser = await user.save();
+  res.status(200).json(updatedUser);
+});
+
 // @desc    Get User cart
 // @route   GET /api/users/cart
 // @access  Private
@@ -126,6 +137,15 @@ const setWishlist = asyncHandler(async (req, res) => {
   res.json({ message: "wishlist updated" });
 });
 
+// @desc    Get User Orders
+// @route   GET /api/users/orders
+// @access  Private
+const getUserOrders = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).populate("placed_orders");
+
+  res.json(user.placed_orders);
+});
+
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "30d",
@@ -136,8 +156,10 @@ module.exports = {
   registerUser,
   loginUser,
   getMe,
+  updateMe,
   setCart,
   getCart,
   getWishlist,
   setWishlist,
+  getUserOrders,
 };

@@ -8,22 +8,11 @@ const Category = require("../models/categoryModel");
 const getProducts = asyncHandler(async (req, res) => {
   const products = await Product.find()
     .select("name price images category")
+    .populate({ path: "category", select: "name" })
+    .sort({ createdAt: -1 })
     .lean();
-  const categories = await Category.find().select("name");
 
-  // replacing the category ids with category names in product objects
-  const updatedProducts = products.map((product) => {
-    if (product.category) {
-      return {
-        ...product,
-        category: categories.find(
-          (cat) => cat._id.toString() === product.category.toString()
-        )?.name,
-      };
-    }
-    return product;
-  });
-  res.status(200).json(updatedProducts);
+  res.status(200).json(products);
 });
 
 // @desc    Get a single Product
@@ -129,7 +118,6 @@ const updateProduct = asyncHandler(async (req, res) => {
   product.category = req.body.category;
   if (req.body.category === "") product.category = null;
   product.use_category_description = req.body.use_category_description;
-  console.log(product.use_category_description);
   product.description = req.body.description;
   product.price = req.body.price;
   product.images = req.body.images;
