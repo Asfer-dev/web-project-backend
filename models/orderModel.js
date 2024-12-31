@@ -7,7 +7,15 @@ const OrderSchema = mongoose.Schema(
       type: Number,
       unique: true,
     },
-    line_items: { type: Array, required: true },
+    line_items: {
+      type: [
+        {
+          productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+          quantity: Number,
+        },
+      ],
+      required: true,
+    },
     name: { type: String, required: true },
     email: { type: String, required: true },
     city: { type: String, required: true },
